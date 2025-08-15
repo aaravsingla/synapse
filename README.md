@@ -10,6 +10,13 @@ Try Synapse right now: **[https://synapse-grabhack.streamlit.app/](https://synap
 
 No setup required - just visit the link and start experimenting with different logistics scenarios!
 
+
+
+
+<img width="1817" height="808" alt="image" src="https://github.com/user-attachments/assets/2290f6c0-7621-40e9-bcb8-aaf17e9d3050" />
+
+
+
 ## 🎯 What Does Synapse Do?
 
 Synapse handles challenging logistics scenarios such as:
@@ -18,6 +25,9 @@ Synapse handles challenging logistics scenarios such as:
 - **Recipient Unavailability**: Finding safe alternatives when recipients aren't available
 - **Traffic Issues**: Rerouting rides and deliveries around obstacles
 - **General Logistics**: Any custom scenario involving deliveries, rides, or customer service
+
+<img width="919" height="714" alt="image" src="https://github.com/user-attachments/assets/b06d837b-66d5-419f-8d01-bec9ed682e74" />
+
 
 ## 🏗️ Architecture
 
@@ -318,4 +328,5 @@ Built with cutting-edge technologies:
 **👉 Try the live demo: [https://synapse-grabhack.streamlit.app/](https://synapse-grabhack.streamlit.app/)**
 
 *Synapse demonstrates how AI agents can handle complex, multi-step logistics problems while maintaining safety through policy-based decision making - perfect for learning advanced AI development patterns.*
+
 
