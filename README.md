@@ -41,37 +41,52 @@ The system follows a **THOUGHT → ACTION → OBSERVATION → POLICY** loop:
 
 ## 🛠️ Available Tools
 
-Synapse has access to 17 specialized tools:
+Synapse has access to **27 specialized tools**, grouped by function:
 
-### Traffic & Routing
-- `check_traffic(origin, destination)` - Check traffic conditions
-- `calculate_alternative_route(origin, destination)` - Find alternate routes
-- `re_route_driver(driver_id, new_route)` - Reassign driver routes
+### 🚦 Traffic & Routing
+- `check_traffic(origin, destination)` — Check traffic conditions.  
+- `calculate_alternative_route(origin, destination)` — Find alternate routes.  
+- `re_route_driver(driver_id, new_route)` — Reassign driver routes.  
+- `assign_microtask(driver_id, task)` — Optimize driver idle time with micro-assignments.  
 
-### Merchant Management
-- `get_merchant_status(merchant_id)` - Check restaurant prep times and status
-- `get_nearby_merchants(merchant_type, location, radius_km)` - Find alternatives
-- `log_merchant_packaging_feedback(merchant_id, feedback)` - Log quality issues
+### 🛒 Merchant Management
+- `get_merchant_status(merchant_id)` — Check restaurant prep times and status.  
+- `get_nearby_merchants(merchant_type, location, radius_km)` — Find alternative merchants.  
+- `log_merchant_packaging_feedback(merchant_id, feedback)` — Log quality issues.  
+- `merchant_menu_equivalents(item, merchant_id)` — Suggest equivalent menu items across merchants.  
 
-### Customer & Driver Communication
-- `notify_customer(customer_id, message)` - Send customer notifications
-- `notify_passenger_and_driver(passenger_id, driver_id, message)` - Notify both parties
-- `contact_recipient_via_chat(recipient_id, message)` - Chat with recipients
+### 👥 Customer & Driver Communication
+- `notify_customer(customer_id, message)` — Send customer notifications.  
+- `notify_passenger_and_driver(passenger_id, driver_id, message)` — Notify both passenger and driver.  
+- `contact_recipient_via_chat(recipient_id, message)` — Chat with recipients.  
 
-### Delivery Management
-- `find_nearby_locker(location)` - Locate secure drop-off points
-- `suggest_safe_drop_off(location)` - Recommend safe alternatives
+### 📦 Delivery Management
+- `find_nearby_locker(location)` — Locate secure parcel drop-off points.  
+- `suggest_safe_drop_off(location)` — Recommend safe alternatives.  
+- `verify_address(address_text)` — Validate and normalize delivery addresses.  
+- `check_weather(location)` — Monitor weather for delivery impact.  
 
-### Dispute Resolution
-- `collect_evidence(order_id)` - Gather photos and documentation
-- `analyze_evidence(evidence)` - AI analysis of dispute evidence
-- `initiate_mediation_flow(order_id)` - Start formal mediation
-- `issue_instant_refund(order_id, amount)` - Process refunds
-- `exonerate_driver(driver_id)` - Clear driver of fault
-- `notify_resolution(order_id, resolution)` - Communicate final resolution
+### ⚖️ Dispute Resolution
+- `collect_evidence(order_id)` — Gather photos and documentation.  
+- `analyze_evidence(evidence)` — AI analysis of dispute evidence.  
+- `initiate_mediation_flow(order_id)` — Start formal mediation.  
+- `issue_instant_refund(order_id, amount)` — Process refunds (**⚠️ capped at 20% of total order value**).  
+- `exonerate_driver(driver_id)` — Clear driver of fault.  
+- `notify_resolution(order_id, resolution)` — Communicate final resolution.  
 
-### Flight Integration
-- `check_flight_status(flight_number)` - Check flight delays for airport trips
+### ✈️ Flight & Travel
+- `check_flight_status(flight_number)` — Check flight delays for airport trips.  
+
+### 🔒 Safety, Fraud & Compliance
+- `voucher_policy_decider(context)` — Enforce voucher issuance policies.  
+- `pii_redact(text)` — Redact personal identifiable information before use.  
+- `policy_guard(action, args)` — Enforce allowlist/denylist and block unsafe actions.  
+- `fraud_signal_check(order_id, customer_id)` — Detect fraud, abuse, or chargeback risk.  
+- `resource_lock_manager(resource_id, action)` — Prevent double-assignments of resources.  
+- `audit_log(entry)` — Append-only action log for accountability.  
+- `metrics_emit(metric_name, value)` — Emit monitoring metrics for performance & safety.  
+
+
 
 ## 🚀 Getting Started
 
@@ -328,5 +343,6 @@ Built with cutting-edge technologies:
 **👉 Try the live demo: [https://synapse-grabhack.streamlit.app/](https://synapse-grabhack.streamlit.app/)**
 
 *Synapse demonstrates how AI agents can handle complex, multi-step logistics problems while maintaining safety through policy-based decision making - perfect for learning advanced AI development patterns.*
+
 
 
