@@ -1,5 +1,3 @@
-
-
 import os
 import streamlit as st
 
@@ -11,12 +9,6 @@ if "GOOGLE_API_KEY" in st.secrets:
     os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
 elif "GEMINI_API_KEY" in st.secrets:
     os.environ["GOOGLE_API_KEY"] = st.secrets["GEMINI_API_KEY"]
-
-
-
-# ... keep. the same ...
-
-
 
 import json
 from agents.agent_runner import run_scenario_text
@@ -53,29 +45,34 @@ if st.sidebar.button("Run Scenario"):
         with st.spinner("Running Synapse agent..."):
             result = run_scenario_text(scenario_text)
         
-        st.subheader("🔍 Agent Trace")
-        steps = result["trace"].splitlines()
-        for line in steps:
-            if line.startswith("THOUGHT:"):
-                st.markdown(f"🧠 **{line}**")
-            elif line.startswith("ACTION:"):
-                st.markdown(f"🔧 `{line}`")
-            elif line.startswith("OBSERVATION:"):
-                try:
-                    obs = json.loads(line.replace("OBSERVATION:", "").strip())
-                    st.json(obs)
-                except:
-                    st.write(line)
-            elif line.startswith("POLICY:"):
-                try:
-                    pol = json.loads(line.replace("POLICY:", "").strip())
-                    color = "red" if pol.get("escalate") else "green"
-                    st.markdown(f"🛡️ **POLICY (conf {pol['confidence']})**")
-                    st.json(pol)
-                except:
-                    st.write(line)
-            elif line.startswith("FINAL_PLAN:"):
-                st.success(line)
-
+        # ✅ SHOW FINAL PLAN FIRST
         st.subheader("✅ Final Plan")
-        st.write(result["final_plan"])
+        if result["final_plan"]:
+            st.success(result["final_plan"])
+        else:
+            st.info("No final plan generated.")
+        
+        # ✅ SHOW AGENT TRACE SECOND (with expander for better UX)
+        with st.expander("🔍 View Detailed Agent Trace", expanded=False):
+            steps = result["trace"].splitlines()
+            for line in steps:
+                if line.startswith("THOUGHT:"):
+                    st.markdown(f"🧠 **{line}**")
+                elif line.startswith("ACTION:"):
+                    st.markdown(f"🔧 `{line}`")
+                elif line.startswith("OBSERVATION:"):
+                    try:
+                        obs = json.loads(line.replace("OBSERVATION:", "").strip())
+                        st.json(obs)
+                    except:
+                        st.write(line)
+                elif line.startswith("POLICY:"):
+                    try:
+                        pol = json.loads(line.replace("POLICY:", "").strip())
+                        color = "red" if pol.get("escalate") else "green"
+                        st.markdown(f"🛡️ **POLICY (conf {pol['confidence']})**")
+                        st.json(pol)
+                    except:
+                        st.write(line)
+                elif line.startswith("FINAL_PLAN:"):
+                    st.success(line)
