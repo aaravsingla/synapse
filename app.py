@@ -27,7 +27,7 @@ scenario_choice = st.sidebar.radio(
 
 scenario_text = ""
 if scenario_choice == "Overloaded Restaurant":
-    scenario_text = "An order is placed, but get_merchant_status() shows 40-min kitchen prep time."
+    scenario_text = "Order #A123: merchant m_22 reports prep_time_min=40, driver d_9 is idle nearby, customer c_55 expects food in 20 minutes. Resolve with minimal wait and minimal driver idle time."
 elif scenario_choice == "Damaged Packaging Dispute":
     scenario_text = "At delivery, dispute arises over spilled drink; unclear if merchant packaging or driver fault."
 elif scenario_choice == "Recipient Unavailable":
