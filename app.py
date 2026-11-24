@@ -15,35 +15,29 @@ from agents.agent_runner import run_scenario_text, DEFAULT_MODEL
 
 st.set_page_config(page_title="Synapse Agent Demo", layout="wide")
 
-st.title("🤖 Project Synapse Demo")
-st.write("Interactive demo of the Synapse agent. Choose a scenario or enter your own.")
+# Header layout with title on the left and model selection on the top right
+col_title, col_model = st.columns([3, 1])
 
-# Sidebar Configuration
-st.sidebar.header("Configuration")
-api_key_from_env = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
-user_api_key = st.sidebar.text_input(
-    "Gemini API Key:",
-    type="password",
-    value=api_key_from_env,
-    help="Loaded automatically from Streamlit secrets or environment if configured."
-)
-if user_api_key:
-    os.environ["GEMINI_API_KEY"] = user_api_key
-    os.environ["GOOGLE_API_KEY"] = user_api_key
+with col_title:
+    st.title("🤖 Project Synapse Demo")
+    st.write("Interactive demo of the Synapse agent. Choose a scenario or enter your own.")
 
 available_models = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro"]
-selected_model = st.sidebar.selectbox(
-    "Gemini Model:",
-    available_models,
-    index=0,
-    help="Default is gemini-2.5-flash (gemini-2.0-flash has been retired by Google)."
-)
+with col_model:
+    # Popover / dropdown button on the top right to select model
+    with st.popover("⚙️ Model: Select"):
+        selected_model = st.selectbox(
+            "Select Gemini Model",
+            available_models,
+            index=0,
+            help="Default is gemini-2.5-flash (gemini-2.0-flash has been retired by Google)."
+        )
 
 # Sidebar for inputs
 st.sidebar.header("Scenario Selection")
 scenario_choice = st.sidebar.radio(
     "Pick a scenario:",
-    ["Overloaded Restaurant", "Damaged Packaging Dispute", "Recipient Unavailable", "Traffic Obstruction", "Custom"]
+    ["Overloaded Restaurant", "Damaged Packaging Dispute", "Recipient Unavailable", "Traffic Obstruction", "Custom Scenario"]
 )
 
 scenario_text = ""
@@ -56,13 +50,50 @@ elif scenario_choice == "Recipient Unavailable":
 elif scenario_choice == "Traffic Obstruction":
     scenario_text = "Passenger is on urgent trip; check_traffic() detects major accident on planned route."
 else:
-    scenario_text = st.sidebar.text_area("Describe your scenario:")
+    # Enclose Custom Scenario in a styled colored box
+    with st.sidebar.container(border=True):
+        st.markdown(
+            """
+            <div style="background-color: #f0f7ff; padding: 12px; border-radius: 8px; border: 1.5px solid #0066cc; margin-bottom: 10px;">
+                <h4 style="margin: 0 0 8px 0; color: #0066cc; font-size: 16px;">✨ Custom Scenario</h4>
+                <p style="margin: 0; color: #333333; font-size: 13px;">Describe your scenario and parameters below:</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        scenario_text = st.text_area("Custom scenario details:", height=150, placeholder="Enter scenario description...")
+
+# Custom CSS for bigger "Run Custom Scenario" button
+st.sidebar.markdown(
+    """
+    <style>
+    div[data-testid="stSidebar"] div.stButton > button {
+        width: 100%;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    div[data-testid="stSidebar"] div.stButton > button.custom-btn {
+        padding: 14px 20px !important;
+        font-size: 18px !important;
+        font-weight: 700 !important;
+        background-color: #0066cc !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.35) !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+is_custom = (scenario_choice == "Custom Scenario")
+button_label = "🚀 Run Custom Scenario" if is_custom else "Run Scenario"
 
 # Run agent button
-if st.sidebar.button("Run Scenario"):
-    effective_key = user_api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+if st.sidebar.button(button_label, type="primary" if is_custom else "secondary"):
+    effective_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not effective_key:
-        st.error("⚠️ Gemini API Key not found! Please set `GEMINI_API_KEY` in your Streamlit secrets or enter it in the sidebar.")
+        st.error("⚠️ Gemini API Key not found! Please set `GEMINI_API_KEY` in your Streamlit secrets.")
     elif scenario_text.strip() == "":
         st.warning("Please enter a scenario.")
     else:
