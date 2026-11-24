@@ -4,10 +4,36 @@ from google import genai
 from tools import simulated_tools as tools
 from tools.policy import estimate_confidence, policy_advice
 
-# client reads GEMINI_API_KEY from env var by default
-client = genai.Client()
+DEFAULT_MODEL = "gemini-2.5-flash"
+DEPRECATED_MODELS = {
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-001",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-001",
+    "gemini-1.5-flash-002",
+    "gemini-1.5-pro",
+}
 
-MODEL = os.getenv("SYNAPSE_MODEL", "gemini-2.0-flash")  # dev-friendly; swap to gemini-2.5-flash if you have access
+def get_default_model() -> str:
+    env_model = os.getenv("SYNAPSE_MODEL", "").strip()
+    if env_model in DEPRECATED_MODELS:
+        return DEFAULT_MODEL
+    return env_model or DEFAULT_MODEL
+
+def get_client(api_key: str = None) -> genai.Client:
+    key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if key:
+        return genai.Client(api_key=key)
+    return genai.Client()
+
+# Backward-compatible client instance
+try:
+    client = get_client()
+except Exception:
+    client = None
+
+MODEL = get_default_model()
 
 SYSTEM_INSTRUCTION = """
 ROLE: You are Synapse, an agentic last-mile coordinator. 
@@ -105,16 +131,37 @@ TOOL_MAP = {
 ACTION_RE = re.compile(r"ACTION:\s*([a-zA-Z_0-9]+)\s*\(\s*(\{.*?\})\s*\)", re.DOTALL)
 
 
-def run_scenario_text(scenario_text, max_steps=6, model=MODEL):
+def run_scenario_text(scenario_text, max_steps=6, model=None, api_key=None, client=None):
+    if client is None:
+        client = get_client(api_key)
+
+    active_model = model or get_default_model()
+    if active_model in DEPRECATED_MODELS:
+        active_model = DEFAULT_MODEL
+
     trace = SYSTEM_INSTRUCTION + "\nScenario: " + scenario_text + "\n"
     full_trace = ""
 
     for step in range(max_steps):
-        response = client.models.generate_content(
-            model=model,
-            contents=trace,
-            config={"temperature": 0}
-        )
+        try:
+            response = client.models.generate_content(
+                model=active_model,
+                contents=trace,
+                config={"temperature": 0}
+            )
+        except Exception as e:
+            err_str = str(e).lower()
+            # If the selected model is deprecated/not found, automatically fallback to DEFAULT_MODEL
+            if active_model != DEFAULT_MODEL and any(k in err_str for k in ["404", "not found", "not available", "is not supported"]):
+                active_model = DEFAULT_MODEL
+                response = client.models.generate_content(
+                    model=active_model,
+                    contents=trace,
+                    config={"temperature": 0}
+                )
+            else:
+                raise
+
         out = getattr(response, "text", None) or str(response)
         out = out.strip()
         full_trace += "\n" + out

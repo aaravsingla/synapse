@@ -5,11 +5,12 @@ from agents.agent_runner import run_scenario_text
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--scenario", required=True, help="path to scenario json")
+    parser.add_argument("--model", default=None, help="Gemini model to use (default: gemini-2.5-flash)")
     args = parser.parse_args()
     with open(args.scenario, "r", encoding="utf-8") as f:
         data = json.load(f)
     desc = data.get("description") or json.dumps(data)
-    result = run_scenario_text(desc)
+    result = run_scenario_text(desc, model=args.model)
     print("=== TRACE ===")
     print(result["trace"])
     print("\n=== FINAL PLAN ===")

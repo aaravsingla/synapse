@@ -228,11 +228,12 @@ Synapse includes a sophisticated policy system that:
 
 ### Environment Variables
 - `GEMINI_API_KEY` - Your Google Gemini API key
-- `SYNAPSE_MODEL` - Model to use (default: `gemini-2.0-flash`)
+- `SYNAPSE_MODEL` - Model to use (default: `gemini-2.5-flash`)
 
 ### Model Options
-- `gemini-2.0-flash` - Fast, good for development
-- `gemini-2.5-flash` - More capable (if you have access)
+- `gemini-2.5-flash` - Fast, capable, default production model
+- `gemini-2.5-flash-lite` - Lightweight, cost-effective
+- `gemini-2.5-pro` - High reasoning capability
 
 ## 📁 Project Structure
 
